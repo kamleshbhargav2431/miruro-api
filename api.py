@@ -4,7 +4,6 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from dotenv import load_dotenv
-from server_route import router as server_router
 
 load_dotenv()
 
@@ -22,10 +21,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(server_router)
-HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Referer": "https://www.miruro.online/"}
+
+@app.middleware("http")
+async def secure_api(request: Request, call_next):
+    return await call_next(request)
+
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Referer": "https://www.miruro.tv/"}
 ANILIST_URL = "https://graphql.anilist.co"
-MIRURO_PIPE_URL = "https://www.miruro.online/api/secure/pipe"
+MIRURO_PIPE_URL = "https://www.miruro.tv/api/secure/pipe"
 
 def _proxy_img(url: str) -> str:
     # Proxy removed — return original image URL
